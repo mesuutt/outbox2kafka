@@ -8,19 +8,19 @@ mod error;
 mod outbox;
 mod db;
 mod kafka;
-mod args;
+mod cli;
 
 use error::AppResult;
-use crate::args::Args;
+use crate::cli::Opt;
 use crate::db::create_pool;
 use crate::outbox::Producer;
 
 #[tokio::main]
 async fn main() -> AppResult<()> {
-    let args = Args::from_args();
-    println!("{:?}", args.clone());
-    let db_pool = create_pool(args.db_url).await?;
-    let producer = Producer::new(db_pool);
+    let opts = Opt::from_args();
+    println!("{:?}", opts.clone());
+    let db_pool = create_pool(opts.db_url).await?;
+    let producer = Producer::new(db_pool, opts.brokers, opts.topic, opts.check_interval, opts.clean_after);
     producer.start().await?;
 
     // let consumer = kafka::

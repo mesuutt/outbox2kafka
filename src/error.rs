@@ -6,6 +6,8 @@ pub type AppResult<T> = Result<T, AppError>;
 pub enum AppError {
     #[error("An error occurred at db: {0}")]
     DBError(String),
+    #[error("An error occurred while parsing cli options: {0}")]
+    CLIParseError(String),
 }
 
 impl From<sqlx::Error> for AppError {
