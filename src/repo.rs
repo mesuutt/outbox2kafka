@@ -15,6 +15,8 @@ impl Repo {
     }
 
     pub async fn get_for_process<F>(&self, mut func: F) -> AppResult<()>
+        // TODO: we use FnMut because producer is mutable.
+        // If we use another lib we can use Fn
         where F: FnMut(&Record) -> AppResult<()> {
         self.pool.begin().await?;
 
