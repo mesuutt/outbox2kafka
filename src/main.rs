@@ -5,22 +5,30 @@ use crate::error::AppError;
 use structopt::StructOpt;
 
 mod error;
-mod outbox;
+mod producer;
 mod db;
-mod kafka;
 mod cli;
+mod repo;
+mod model;
+mod cleaner;
 
 use error::AppResult;
 use crate::cli::Opt;
 use crate::db::create_pool;
-use crate::outbox::Producer;
+use crate::producer::Producer;
+use crate::repo::Repo;
 
 #[tokio::main]
 async fn main() -> AppResult<()> {
     let opts = Opt::from_args();
     println!("{:?}", opts.clone());
     let db_pool = create_pool(opts.db_url).await?;
-    let producer = Producer::new(db_pool, opts.brokers, opts.topic, opts.check_interval, opts.clean_after);
+    let repo = Repo::new(db_pool, opts.retention);
+    let mut producer  = match Producer::new(opts.brokers, opts.topic, repo, opts.db_check_interval) {
+        Ok(p) => p,
+        Err(e) => return Err(e),
+    };
+
     producer.start().await?;
 
     // let consumer = kafka::

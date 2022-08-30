@@ -2,12 +2,15 @@ use thiserror::Error as ThisError;
 
 pub type AppResult<T> = Result<T, AppError>;
 
-#[derive(Clone, Debug, ThisError)]
+#[derive(Debug, ThisError)]
 pub enum AppError {
     #[error("An error occurred at db: {0}")]
     DBError(String),
     #[error("An error occurred while parsing cli options: {0}")]
     CLIParseError(String),
+    #[error("Kafka error: {0}")]
+    KafkaError(#[from] kafka::Error),
+
 }
 
 impl From<sqlx::Error> for AppError {

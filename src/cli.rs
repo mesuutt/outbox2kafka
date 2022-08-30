@@ -13,14 +13,14 @@ pub struct Opt {
     #[structopt(short, long, env = "DATABASE_URL")]
     pub db_url: String,
 
-    #[structopt(short, long, default_value = "localhost:9092")]
+    #[structopt(short, long, default_value = "localhost:9092", about="comma separated broker list")]
     pub brokers: String,
 
-    #[structopt(short, long, parse(try_from_str = parse_duration), default_value = "1s", about = "outbox table check interval, time units: mon,w,d,h,m,s,ms")]
-    pub check_interval: Duration,
+    #[structopt(long, parse(try_from_str = parse_duration), default_value = "10ms", about = "outbox table check interval, time units: mon,w,d,h,m,s,ms")]
+    pub db_check_interval: Duration,
 
-    #[structopt(long,  parse(try_from_str = parse_duration), default_value = "0ms", about = "clean sent events from outbox after time passed. 0 means never. If duration <= 1ms the events will be removed immediately. Supported time units: mon,w,d,h,m,s,ms")]
-    pub clean_after: Duration,
+    #[structopt(long,  parse(try_from_str = parse_duration), default_value = "0ms", about = "Retention period of processed records. 0 means never. Supported time units: mon,w,d,h,m,s,ms")]
+    pub retention: Duration,
 }
 
 fn parse_duration(src: &str) -> AppResult<Duration> {
