@@ -1,4 +1,3 @@
-
 use uuid::Uuid;
 
 #[derive(Debug)]
@@ -7,8 +6,8 @@ pub struct Record {
     pub aggregate_type: String,
     pub aggregate_id: String,
     pub event_type: String,
-    pub payload: serde_json::Value,
-    pub metadata: serde_json::Value,
+    pub payload: String,
+    pub metadata: Option<String>,
 }
 
 impl Record {
