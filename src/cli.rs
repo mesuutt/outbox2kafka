@@ -1,8 +1,6 @@
-
-
-use structopt::StructOpt;
-use std::time::Duration;
 use crate::{AppError, AppResult};
+use std::time::Duration;
+use structopt::StructOpt;
 
 #[derive(Debug, Clone, StructOpt)]
 #[structopt(name = "outbox2kafka", about = "Read outbox table and send events to kafka")]
@@ -13,7 +11,7 @@ pub struct Opt {
     #[structopt(short, long, env = "DATABASE_URL")]
     pub db_url: String,
 
-    #[structopt(short, long, default_value = "localhost:9092", about="comma separated broker list")]
+    #[structopt(short, long, default_value = "localhost:9092", about = "comma separated broker list")]
     pub brokers: String,
 
     #[structopt(long, parse(try_from_str = parse_duration), default_value = "10ms", about = "outbox table check interval, time units: mon,w,d,h,m,s,ms")]

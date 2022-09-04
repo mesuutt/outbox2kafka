@@ -1,19 +1,19 @@
+use log::{debug, error, info, log_enabled, Level};
 use structopt::StructOpt;
-use log::{debug, error, log_enabled, info, Level};
 
-mod error;
-mod producer;
-mod db;
-mod cli;
-mod repo;
-mod model;
 mod cleaner;
+mod cli;
+mod db;
+mod error;
+mod model;
+mod producer;
+mod repo;
 
-use error::{AppResult, AppError};
 use crate::cli::Opt;
 use crate::db::create_pool;
 use crate::producer::Producer;
 use crate::repo::Repo;
+use error::{AppError, AppResult};
 
 #[tokio::main]
 async fn main() -> AppResult<()> {
@@ -24,7 +24,7 @@ async fn main() -> AppResult<()> {
     let db_pool = create_pool(opts.db_url).await?;
     let repo = Repo::new(db_pool, opts.retention);
 
-    let producer  = match Producer::new(opts.brokers, opts.topic, repo, opts.db_check_interval) {
+    let producer = match Producer::new(opts.brokers, opts.topic, repo, opts.db_check_interval) {
         Ok(p) => p,
         Err(e) => return Err(e),
     };
@@ -33,4 +33,3 @@ async fn main() -> AppResult<()> {
 
     Ok(())
 }
-

@@ -10,7 +10,11 @@ pub struct OutboxCleaner {
 
 impl OutboxCleaner {
     pub fn new(repo: Repo, run_interval: Duration, retention: Duration) -> Self {
-        Self { repo, run_interval, retention }
+        Self {
+            repo,
+            run_interval,
+            retention,
+        }
     }
 
     pub fn run(&self) {

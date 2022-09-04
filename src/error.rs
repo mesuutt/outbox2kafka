@@ -10,16 +10,13 @@ pub enum AppError {
     CLIParseError(String),
     #[error("Kafka error: {0}")]
     KafkaError(#[from] kafka::Error),
-
 }
 
 impl From<sqlx::Error> for AppError {
     fn from(sqlx_error: sqlx::Error) -> Self {
         match sqlx_error.as_database_error() {
             Some(db_error) => AppError::DBError(db_error.to_string()),
-            None => {
-                AppError::DBError(String::from("Unrecognized database error!"))
-            }
+            None => AppError::DBError(String::from("Unrecognized database error!")),
         }
     }
 }

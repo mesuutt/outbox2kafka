@@ -1,8 +1,8 @@
-use std::time::Duration;
-use uuid::Uuid;
-use crate::AppResult;
 use crate::db::DbPool;
 use crate::model::Record;
+use crate::AppResult;
+use std::time::Duration;
+use uuid::Uuid;
 
 pub struct Repo {
     pool: DbPool,
@@ -15,9 +15,11 @@ impl Repo {
     }
 
     pub async fn get_for_process<F>(&self, mut func: F) -> AppResult<()>
-        // TODO: we use FnMut because producer is mutable.
-        // If we use another lib we can use Fn
-        where F: FnMut(&Record) -> AppResult<()> {
+    // TODO: we use FnMut because producer is mutable.
+    // If we use another lib we can use Fn
+    where
+        F: FnMut(&Record) -> AppResult<()>,
+    {
         self.pool.begin().await?;
 
         if let Some(record) = self.get_one_record().await? {
@@ -34,15 +36,16 @@ impl Repo {
 
     async fn get_one_record(&self) -> AppResult<Option<Record>> {
         let q = sqlx::query_as!(
-        Record,
-        r#"Select
+            Record,
+            r#"Select
                 id, aggregate_type, aggregate_id,
                 event_type, payload, metadata
             from messaging_outbox
             where processed_at is null
             order by created
             FOR UPDATE SKIP LOCKED
-        "#);
+        "#
+        );
         let record = q.fetch_optional(&self.pool).await?;
 
         Ok(record)
