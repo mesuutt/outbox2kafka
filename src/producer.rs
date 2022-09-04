@@ -24,10 +24,12 @@ impl Producer {
             .into_iter()
             .map(|x| x.to_string())
             .collect();
+
         let producer = KafkaProducer::from_hosts(broker_list)
             .with_ack_timeout(Duration::from_secs(1))
             .with_required_acks(RequiredAcks::One)
             .create()?;
+
         Ok(Self {
             topic,
             repo,
