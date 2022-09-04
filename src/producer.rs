@@ -1,7 +1,7 @@
-use kafka::producer::{Producer as KafkaProducer, Record as KafkaRecord, RequiredAcks};
-use log::info;
 use std::cell::RefCell;
 use tokio::time::{sleep, Duration};
+use log::info;
+use kafka::producer::{Producer as KafkaProducer, Record as KafkaRecord, RequiredAcks};
 
 use crate::model::Record;
 use crate::repo::Repo;
@@ -11,7 +11,8 @@ pub struct Producer {
     topic: String,
     repo: Repo,
     check_interval: Duration,
-    // KafkaProducer::send needs mutable ref, but I don't want keep the producer as mutable.
+    // KafkaProducer::send needs mutable ref
+    // RefCell was used for get rid of necessity of mutable ref
     producer: RefCell<KafkaProducer>,
 }
 
