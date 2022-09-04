@@ -1,4 +1,6 @@
+use std::cell::RefCell;
 use kafka::producer::{Producer as KafkaProducer, Record as KafkaRecord, RequiredAcks};
+use log::info;
 use tokio::time::{Duration, sleep};
 
 use crate::AppResult;
@@ -9,7 +11,8 @@ pub struct Producer {
     topic: String,
     repo: Repo,
     check_interval: Duration,
-    producer: KafkaProducer,
+    // KafkaProducer::send needs mutable ref, but I don't want keep the producer as mutable.
+    producer: RefCell<KafkaProducer>,
 }
 
 impl Producer {
@@ -19,10 +22,10 @@ impl Producer {
             .with_ack_timeout(Duration::from_secs(1))
             .with_required_acks(RequiredAcks::One)
             .create()?;
-        Ok(Self { topic, repo, check_interval, producer })
+        Ok(Self { topic, repo, check_interval, producer: RefCell::new(producer) })
     }
 
-    pub async fn start(&mut self) -> AppResult<()> {
+    pub async fn start(&self) -> AppResult<()> {
         loop {
             self.repo.get_for_process(|record: &Record| {
                 let message = &KafkaRecord {
@@ -32,9 +35,9 @@ impl Producer {
                     partition: -1,
                 };
 
-                self.producer.send(message)?;
+                self.producer.borrow_mut().send(message)?;
 
-                println!("Process record: {:?}", record);
+                info!("record sent to kafka: {:?}", record.key());
                 Ok(())
             }).await?;
 
