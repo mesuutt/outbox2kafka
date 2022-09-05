@@ -1,7 +1,10 @@
+use std::future::Future;
+
 use crate::db::DbPool;
 use crate::model::Record;
-use crate::AppResult;
+use crate::{AppResult};
 use std::time::Duration;
+
 use uuid::Uuid;
 
 
@@ -15,20 +18,22 @@ impl Repo {
         Self { pool, retention }
     }
 
-    pub async fn get_for_process<F>(&self, func: F) -> AppResult<()>
-    where
-        F: Fn(&Record) -> AppResult<()>,
+    pub async fn get_for_process<F, T>(&self, func: F) -> AppResult<()>
+        where
+            F: Fn(Record) -> T,
+            T: Future<Output = AppResult<()>> + Send,
     {
         // We are creating a db transaction.
         // If not error occurred the tx will commit.
         self.pool.begin().await?;
 
         if let Some(record) = self.get_one_record().await? {
-            func(&record)?;
+            let record_id = record.id;
+            func(record).await?;
             if self.retention.is_zero() {
-                self.delete_record(record.id).await?
+                self.delete_record(record_id).await?
             } else {
-                self.mark_as_processed(record.id).await?;
+                self.mark_as_processed(record_id).await?;
             }
         }
 

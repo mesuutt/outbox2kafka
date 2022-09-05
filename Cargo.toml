@@ -11,10 +11,11 @@ tokio = { version = "1.20.1", features = ["full"] }
 uuid = { version = "1.1.2", features = ["v4", "fast-rng", "macro-diagnostics"] }
 sqlx = { version = "0.6", features = [ "runtime-tokio-rustls", "postgres", "uuid", "json", "chrono"] }
 rustls = "0.20.6"
+futures = "0.3"
 async-trait = "0.1.57"
 serde_json = "1.0.83"
 structopt = { version = "0.3", default-features = false }
 duration-str = "0.4.0"
-kafka = "0.9"
+rdkafka = { version = "0.25", features = ["cmake-build"] }
 log = "0.4.17"
 env_logger = "0.9.0"

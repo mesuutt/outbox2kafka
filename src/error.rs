@@ -1,3 +1,5 @@
+use rdkafka::error::KafkaError;
+
 use thiserror::Error as ThisError;
 
 pub type AppResult<T> = Result<T, AppError>;
@@ -9,7 +11,7 @@ pub enum AppError {
     #[error("An error occurred while parsing cli options: {0}")]
     CLIParseError(String),
     #[error("Kafka error: {0}")]
-    KafkaError(#[from] kafka::Error),
+    KafkaError2(#[from] KafkaError),
 }
 
 impl From<sqlx::Error> for AppError {

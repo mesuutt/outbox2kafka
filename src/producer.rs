@@ -1,48 +1,46 @@
-use std::cell::RefCell;
+
 use std::time::Duration;
 use tokio::time::{sleep};
 use log::{error, info};
-use kafka::producer::{Producer as KafkaProducer, Record as KafkaRecord, RequiredAcks};
+
+use rdkafka::producer::{FutureProducer, FutureRecord};
+use rdkafka::config::ClientConfig;
 
 use crate::model::Record;
 use crate::repo::Repo;
-use crate::AppResult;
+use crate::{AppError, AppResult};
 
 pub struct Producer {
     topic: String,
     repo: Repo,
     check_interval: Duration,
-    // KafkaProducer::send needs mutable ref
-    // RefCell was used for get rid of necessity of mutable ref
-    producer: RefCell<KafkaProducer>,
+    producer: FutureProducer,
 }
 
 impl Producer {
-    pub fn new(brokers: Vec<String>, topic: String, repo: Repo, check_interval: Duration) -> AppResult<Self> {
-        let producer = KafkaProducer::from_hosts(brokers)
-            .with_ack_timeout(Duration::from_secs(1))
-            .with_required_acks(RequiredAcks::One)
+    pub fn new(brokers: String, topic: String, repo: Repo, check_interval: Duration) -> AppResult<Self> {
+        let producer: FutureProducer = ClientConfig::new()
+            .set("bootstrap.servers", brokers)
+            .set("message.timeout.ms", "5000")
             .create()?;
 
         Ok(Self {
             topic,
             repo,
             check_interval,
-            producer: RefCell::new(producer),
+            producer,
         })
     }
 
     pub async fn start(&self) {
         loop {
-            let result = self.repo.get_for_process(|record: &Record| {
-                let message = &KafkaRecord {
-                    key: record.key(),
-                    value: record.payload.as_bytes(),
-                    topic: self.topic.as_str(),
-                    partition: -1,
-                };
-
-                self.producer.borrow_mut().send(message)?;
+            let result = self.repo.get_for_process(|record: Record| async move {
+                self.producer.send(
+                    FutureRecord::to(&self.topic)
+                        .payload(&record.payload)
+                        .key(&record.key()),
+                    Duration::from_secs(0),
+                ).await.map_err(|(x,_y)| AppError::KafkaError2(x))?;
 
                 info!("record sent to kafka: {:?}", record.key());
                 Ok(())
