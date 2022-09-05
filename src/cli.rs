@@ -17,7 +17,6 @@ pub struct Opt {
     #[structopt(short, long, default_value = "1", about = "number of workers to use")]
     pub concurrency: u32,
 
-
     #[structopt(short, long, default_value = "5", about = "max db connection to open")]
     pub max_db_connection: u32,
 

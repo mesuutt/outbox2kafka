@@ -27,7 +27,7 @@ async fn main() -> AppResult<()> {
     let repo = Arc::new(Repo::new(db_pool, opts.retention));
 
     let mut tasks = vec![];
-    for n in 0..opts.concurrency {
+    for _n in 0..opts.concurrency {
         let repo = repo.clone();
         let brokers = opts.brokers.clone();
         let topic = opts.topic.clone();
