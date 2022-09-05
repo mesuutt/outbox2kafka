@@ -45,7 +45,7 @@ impl Repo {
             Record,
             r#"Select
                 id, aggregate_type, aggregate_id,
-                event_type, payload, metadata
+                event_type, payload
             from messaging_outbox
             where processed_at is null
             order by created

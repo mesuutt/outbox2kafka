@@ -7,7 +7,7 @@ pub struct Record {
     pub aggregate_id: String,
     pub event_type: String,
     pub payload: String,
-    pub metadata: Option<String>,
+    // TODO: add metadata for headers
 }
 
 impl Record {

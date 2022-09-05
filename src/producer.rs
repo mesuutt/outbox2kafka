@@ -1,4 +1,3 @@
-
 use std::time::Duration;
 use tokio::time::{sleep};
 use log::{error, info};
@@ -38,11 +37,13 @@ impl Producer {
                 self.producer.send(
                     FutureRecord::to(&self.topic)
                         .payload(&record.payload)
-                        .key(&record.key()),
-                    Duration::from_secs(0),
-                ).await.map_err(|(x,_y)| AppError::KafkaError2(x))?;
+                        .key(&record.key()
+                        ), Duration::from_secs(0))
+                    .await
+                    .map_err(|(x, _y)| AppError::KafkaError(x))?;
 
                 info!("record sent to kafka: {:?}", record.key());
+
                 Ok(())
             }).await;
 

@@ -11,7 +11,7 @@ pub enum AppError {
     #[error("An error occurred while parsing cli options: {0}")]
     CLIParseError(String),
     #[error("Kafka error: {0}")]
-    KafkaError2(#[from] KafkaError),
+    KafkaError(#[from] KafkaError),
 }
 
 impl From<sqlx::Error> for AppError {
