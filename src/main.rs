@@ -1,3 +1,6 @@
+use std::sync::Arc;
+use futures::future::join_all;
+use log::error;
 use structopt::StructOpt;
 
 mod cleaner;
@@ -20,11 +23,28 @@ async fn main() -> AppResult<()> {
 
     let opts = Opt::from_args();
 
-    let db_pool = create_pool(opts.db_url, opts.threads).await?;
-    let repo = Repo::new(db_pool, opts.retention);
+    let db_pool = create_pool(opts.db_url, opts.max_db_connection).await?;
+    let repo = Arc::new(Repo::new(db_pool, opts.retention));
 
-    let producer = Producer::new(opts.brokers, opts.topic, repo, opts.db_check_interval)?;
-    producer.start().await;
+    let mut tasks = vec![];
+    for n in 0..opts.concurrency {
+        let repo = repo.clone();
+        let brokers = opts.brokers.clone();
+        let topic = opts.topic.clone();
+
+        let task = tokio::spawn(async move {
+            match Producer::new(brokers, topic, repo, opts.db_check_interval) {
+                Ok(p) => {
+                    p.start().await;
+                }
+                Err(e) => error!("Producer start failed: {}", e),
+            }
+        });
+
+        tasks.push(task);
+    }
+
+    join_all(tasks).await;
 
     Ok(())
 }

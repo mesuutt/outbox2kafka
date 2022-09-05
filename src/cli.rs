@@ -14,8 +14,12 @@ pub struct Opt {
     #[structopt(long, about = "The topic the messages were send")]
     pub topic: String,
 
-    #[structopt(long, default_value = "1", about = "number of threads to use")]
-    pub threads: u32,
+    #[structopt(short, long, default_value = "1", about = "number of workers to use")]
+    pub concurrency: u32,
+
+
+    #[structopt(short, long, default_value = "5", about = "max db connection to open")]
+    pub max_db_connection: u32,
 
     #[structopt(short = "i", long, parse(try_from_str = parse_duration), default_value = "10ms", about = "outbox table check interval, time units: mon,w,d,h,m,s,ms")]
     pub db_check_interval: Duration,

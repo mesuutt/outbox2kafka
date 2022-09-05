@@ -1,3 +1,4 @@
+use std::sync::Arc;
 use std::time::Duration;
 use tokio::time::{sleep};
 use log::{error, info};
@@ -11,13 +12,13 @@ use crate::{AppError, AppResult};
 
 pub struct Producer {
     topic: String,
-    repo: Repo,
+    repo: Arc<Repo>,
     check_interval: Duration,
     producer: FutureProducer,
 }
 
 impl Producer {
-    pub fn new(brokers: String, topic: String, repo: Repo, check_interval: Duration) -> AppResult<Self> {
+    pub fn new(brokers: String, topic: String, repo: Arc<Repo>, check_interval: Duration) -> AppResult<Self> {
         let producer: FutureProducer = ClientConfig::new()
             .set("bootstrap.servers", brokers)
             .set("message.timeout.ms", "5000")
@@ -40,7 +41,7 @@ impl Producer {
                         .key(&record.key()
                         ), Duration::from_secs(0))
                     .await
-                    .map_err(|(x, _y)| AppError::KafkaError(x))?;
+                    .map_err(|(x, _)| AppError::KafkaError(x))?;
 
                 info!("record sent to kafka: {:?}", record.key());
 
