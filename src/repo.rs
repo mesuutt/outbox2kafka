@@ -14,12 +14,12 @@ impl Repo {
         Self { pool, retention }
     }
 
-    pub async fn get_for_process<F>(&self, mut func: F) -> AppResult<()>
-    // TODO: we use FnMut because producer is mutable.
-    // If we use another lib we can use Fn
+    pub async fn get_for_process<F>(&self, func: F) -> AppResult<()>
     where
-        F: FnMut(&Record) -> AppResult<()>,
+        F: Fn(&Record) -> AppResult<()>,
     {
+        // We are creating a db transaction.
+        // If not error occurred the tx will commit.
         self.pool.begin().await?;
 
         if let Some(record) = self.get_one_record().await? {
