@@ -1,5 +1,4 @@
 use rdkafka::error::KafkaError;
-
 use thiserror::Error as ThisError;
 
 pub type AppResult<T> = Result<T, AppError>;

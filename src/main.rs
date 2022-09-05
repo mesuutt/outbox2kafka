@@ -1,6 +1,3 @@
-
-
-
 use structopt::StructOpt;
 
 mod cleaner;
