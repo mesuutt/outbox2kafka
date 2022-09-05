@@ -6,7 +6,6 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-rusqlite = { version = "0.28.0", features = ["bundled"] }
 thiserror = "1.0.31"
 tokio = { version = "1.20.1", features = ["full"] }
 uuid = { version = "1.1.2", features = ["v4", "fast-rng", "macro-diagnostics"] }
