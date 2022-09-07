@@ -4,7 +4,7 @@ use crate::db::DbPool;
 use crate::model::Record;
 use crate::{AppResult};
 use std::time::Duration;
-
+use chrono::{DateTime, Utc};
 use uuid::Uuid;
 
 
@@ -58,7 +58,7 @@ impl Repo {
     }
 
     async fn mark_as_processed(&self, id: Uuid) -> AppResult<()> {
-        let q = sqlx::query!("Update messaging_outbox set processed_at=now() where id=$1", id);
+        let q = sqlx::query!("Update messaging_outbox set processed_at=$1 where id=$2", Utc::now(), id);
         q.execute(&self.pool).await?;
         Ok(())
     }
@@ -69,9 +69,9 @@ impl Repo {
         Ok(())
     }
 
-    /*async fn delete_older_than(&self, time: Uuid) -> AppResult<()> {
+    pub(crate) async fn delete_older_than(&self, time: DateTime<Utc>) -> AppResult<()> {
         let q = sqlx::query!("Delete from messaging_outbox where processed_at <$1", time);
         q.execute(&self.pool).await?;
         Ok(())
-    }*/
+    }
 }

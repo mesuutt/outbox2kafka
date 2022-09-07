@@ -7,10 +7,11 @@ pub type AppResult<T> = Result<T, AppError>;
 pub enum AppError {
     #[error("An error occurred at db: {0}")]
     DBError(String),
-    #[error("An error occurred while parsing cli options: {0}")]
-    CLIParseError(String),
     #[error("Kafka error: {0}")]
     KafkaError(#[from] KafkaError),
+
+    #[error("An error occurred while parsing duration: {0}")]
+    DurationParseError(String),
 }
 
 impl From<sqlx::Error> for AppError {
