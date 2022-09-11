@@ -3,7 +3,7 @@ use std::sync::Arc;
 use std::time;
 use std::time::Duration;
 use tokio::time::{sleep};
-use log::{error, info};
+use log::{debug, error, info};
 
 use rdkafka::producer::{FutureProducer, FutureRecord, Producer as ProducerTrait};
 use rdkafka::config::ClientConfig;
@@ -55,13 +55,13 @@ impl Producer {
                     .await
                     .map_err(|(x, _)| AppError::KafkaError(x))?;
 
-                info!("record sent to kafka: {:?}", record.key());
+                debug!("record sent to kafka: {:?}", record.key());
 
                 Ok(())
             }).await;
 
             if let Err(e) = result {
-                error!("producer failed with error: {:?}", e)
+                error!("producer error: {:?}", e)
             }
 
             sleep(self.check_interval).await;
