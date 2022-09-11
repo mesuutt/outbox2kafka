@@ -26,7 +26,7 @@ pub struct Opt {
     #[structopt(long, parse(try_from_str = parse_cleaner_run_interval), default_value = "10m", about = "interval of deleting old processed records from outbox table. 0 means never delete. Supported time units: mon,w,d,h,m")]
     pub cleaner_run_interval: Duration,
 
-    #[structopt(long, parse(try_from_str = parse_duration), default_value = "0ms", about = "Retention period of processed records in outbox table. 0 means never. Supported time units: mon,w,d,h,m,s,ms")]
+    #[structopt(long, parse(try_from_str = parse_duration), default_value = "1h", about = "Retention period of processed records in outbox table. 0 means never. Supported time units: mon,w,d,h,m,s,ms")]
     pub processed_data_retention: Duration,
 }
 

@@ -2,7 +2,7 @@ extern crate core;
 
 use std::sync::Arc;
 use futures::future::join_all;
-use log::{error, info};
+use log::{info};
 use structopt::StructOpt;
 
 mod cleaner;
