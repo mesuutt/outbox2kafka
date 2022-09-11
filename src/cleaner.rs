@@ -1,9 +1,10 @@
+use std::future::Future;
 use std::ops::Sub;
 use std::sync::Arc;
 use std::time;
 use std::time::Duration;
 use chrono::Utc;
-use log::{error};
+use log::{debug, error, info};
 use tokio::time::sleep;
 
 use crate::{AppError, AppResult, Repo};
@@ -30,13 +31,22 @@ impl OutboxCleaner {
         })
     }
 
-    pub async fn run(&self) {
+    pub async fn run(&self, shutdown: impl Future) {
+        tokio::select! {
+            _ = self.run_forever() => {}
+            _ = shutdown => {
+                info!("cleaner shutting down");
+            }
+        }
+    }
+
+    async fn run_forever(&self) {
         loop {
             if let Err(e) = self.repo.delete_older_than(Utc::now().sub(self.retention)).await {
                 error!("error occurred while deletion of old processed records: {}", e);
             }
-
-            sleep(self.run_interval).await
+            debug!("old processed items deleted");
+            sleep(self.run_interval).await;
         }
     }
 }

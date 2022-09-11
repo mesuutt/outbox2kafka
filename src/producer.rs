@@ -1,9 +1,11 @@
+use std::future::Future;
 use std::sync::Arc;
+use std::time;
 use std::time::Duration;
 use tokio::time::{sleep};
 use log::{error, info};
 
-use rdkafka::producer::{FutureProducer, FutureRecord};
+use rdkafka::producer::{FutureProducer, FutureRecord, Producer as ProducerTrait};
 use rdkafka::config::ClientConfig;
 
 use crate::model::Record;
@@ -32,7 +34,17 @@ impl Producer {
         })
     }
 
-    pub async fn start(&self) {
+    pub async fn run(&self, shutdown: impl Future) {
+        tokio::select! {
+            _ = self.run_forever() => {}
+            _ = shutdown => {
+                self.producer.flush(time::Duration::from_secs(5));
+                info!("producer shutting down");
+            }
+        }
+    }
+
+    async fn run_forever(&self) {
         loop {
             let result = self.repo.get_for_process(|record: Record| async move {
                 self.producer.send(

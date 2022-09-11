@@ -15,10 +15,11 @@ mod repo;
 
 use crate::cli::Opt;
 use crate::db::create_pool;
-use crate::producer::Producer;
+use crate::producer::{Producer};
 use crate::repo::Repo;
 use error::{AppError, AppResult};
 use crate::cleaner::OutboxCleaner;
+use tokio::signal;
 
 #[tokio::main]
 async fn main() -> AppResult<()> {
@@ -35,7 +36,7 @@ async fn main() -> AppResult<()> {
         let cleaner = OutboxCleaner::new(repo.clone(), opts.cleaner_run_interval, opts.processed_data_retention)?;
         let task = tokio::spawn(async move {
             info!("outbox table cleaner starting");
-            cleaner.run().await;
+            cleaner.run(signal::ctrl_c()).await;
         });
 
         tasks.push(task);
@@ -45,7 +46,7 @@ async fn main() -> AppResult<()> {
         let producer = Producer::new(opts.brokers.clone(), opts.topic.clone(), repo.clone(), opts.outbox_check_interval)?;
         let task = tokio::spawn(async move {
             info!("{}. producer worker starting", i);
-            producer.start().await;
+            producer.run(signal::ctrl_c()).await;
         });
 
         tasks.push(task);
