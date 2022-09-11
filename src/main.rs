@@ -33,7 +33,12 @@ async fn main() -> AppResult<()> {
     let mut tasks = vec![];
 
     if !opts.processed_data_retention.is_zero() {
-        let cleaner = OutboxCleaner::new(repo.clone(), opts.cleaner_run_interval, opts.processed_data_retention)?;
+        let cleaner = OutboxCleaner::new(
+            repo.clone(),
+            opts.cleaner_run_interval,
+            opts.processed_data_retention
+        )?;
+
         let task = tokio::spawn(async move {
             info!("outbox table cleaner starting");
             cleaner.run(signal::ctrl_c()).await;
@@ -43,7 +48,13 @@ async fn main() -> AppResult<()> {
     }
 
     for i in 0..opts.concurrency {
-        let producer = Producer::new(opts.brokers.clone(), opts.topic.clone(), repo.clone(), opts.outbox_check_interval)?;
+        let producer = Producer::new(
+            opts.brokers.clone(),
+            opts.topic.clone(),
+            repo.clone(),
+            opts.outbox_check_interval
+        )?;
+
         let task = tokio::spawn(async move {
             info!("{}. producer worker starting", i);
             producer.run(signal::ctrl_c()).await;
