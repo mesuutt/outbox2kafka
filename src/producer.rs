@@ -61,7 +61,7 @@ impl Producer {
             }).await;
 
             if let Err(e) = result {
-                error!("sending event to kafka failed with error: {:?}", e)
+                error!("producer failed with error: {:?}", e)
             }
 
             sleep(self.check_interval).await;
