@@ -3,7 +3,7 @@ use std::sync::Arc;
 use std::time;
 use std::time::Duration;
 use chrono::Utc;
-use log::{error, info};
+use log::{error};
 use tokio::time::sleep;
 
 use crate::{AppError, AppResult, Repo};
