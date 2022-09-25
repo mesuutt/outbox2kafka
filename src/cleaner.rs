@@ -5,7 +5,6 @@ use std::time;
 use std::time::Duration;
 use chrono::Utc;
 use log::{debug, error, info};
-use tokio::time::sleep;
 
 use crate::{AppError, AppResult, Repo};
 
@@ -41,12 +40,15 @@ impl OutboxCleaner {
     }
 
     async fn run_forever(&self) {
+        let mut interval = tokio::time::interval(self.run_interval);
         loop {
+            interval.tick().await;
+
             if let Err(e) = self.repo.delete_older_than(Utc::now().sub(self.retention)).await {
                 error!("error occurred while deletion of old processed records: {}", e);
             }
-            debug!("old processed items deleted");
-            sleep(self.run_interval).await;
+
+            debug!("old processed records deleted from db {}", self.run_interval.as_secs());
         }
     }
 }

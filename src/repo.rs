@@ -45,7 +45,7 @@ impl Repo {
             Record,
             r#"Select
                 id, aggregate_type, aggregate_id,
-                event_type, payload
+                event_type, payload, metadata
             from messaging_outbox
             where processed_at is null
             order by created
@@ -69,7 +69,7 @@ impl Repo {
         Ok(())
     }
 
-    pub(crate) async fn delete_older_than(&self, time: DateTime<Utc>) -> AppResult<()> {
+    pub async fn delete_older_than(&self, time: DateTime<Utc>) -> AppResult<()> {
         let q = sqlx::query!("Delete from messaging_outbox where processed_at <$1", time);
         q.execute(&self.pool).await?;
         Ok(())

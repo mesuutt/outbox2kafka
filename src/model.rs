@@ -1,3 +1,4 @@
+use serde_json::Value;
 use uuid::Uuid;
 
 #[derive(Debug)]
@@ -7,7 +8,7 @@ pub struct Record {
     pub aggregate_id: String,
     pub event_type: String,
     pub payload: String,
-    // TODO: add metadata for headers
+    pub metadata: Option<Value>
 }
 
 impl Record {
