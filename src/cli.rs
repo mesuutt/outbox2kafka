@@ -5,28 +5,28 @@ use structopt::StructOpt;
 #[derive(Debug, Clone, StructOpt)]
 #[structopt(name = "outbox2kafka", about = "Read events from outbox table and send to kafka")]
 pub struct Opt {
-    #[structopt(short, long, env = "DATABASE_URL")]
-    pub db_url: String,
-
-    #[structopt(short, long, default_value = "localhost:9092", about = "Comma separated broker list")]
+    #[structopt(short, long, default_value = "localhost:9092")]
     pub brokers: String,
 
-    #[structopt(long, about = "The topic the messages were send")]
+    #[structopt(long)]
     pub topic: String,
 
-    #[structopt(short, long, default_value = "1", about = "number of workers to use")]
+    #[structopt(short, long, default_value = "1")]
     pub concurrency: u32,
 
-    #[structopt(short, long, default_value = "5", about = "max db connection to open")]
+    #[structopt(short, long, env = "DATABASE_URL", hide_env_values = true)]
+    pub db_url: String,
+
+    #[structopt(long, default_value = "2")]
     pub max_db_connection: u32,
 
-    #[structopt(long, parse(try_from_str = parse_duration), default_value = "10ms", about = "interval of fetching new records from outbox table, time units: mon,w,d,h,m,s,ms")]
+    #[structopt(long, parse(try_from_str = parse_duration), default_value = "10ms")]
     pub outbox_check_interval: Duration,
 
-    #[structopt(long, parse(try_from_str = parse_cleaner_run_interval), default_value = "10m", about = "interval of deleting old processed records from outbox table. 0 means never delete. Supported time units: mon,w,d,h,m")]
+    #[structopt(long, parse(try_from_str = parse_cleaner_run_interval), default_value = "10m")]
     pub cleaner_run_interval: Duration,
 
-    #[structopt(long, parse(try_from_str = parse_duration), default_value = "1h", about = "Retention period of processed records in outbox table. 0 means never. Supported time units: mon,w,d,h,m,s,ms")]
+    #[structopt(long, parse(try_from_str = parse_duration), default_value = "1h")]
     pub processed_data_retention: Duration,
 }
 
