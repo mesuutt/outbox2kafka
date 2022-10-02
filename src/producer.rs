@@ -7,6 +7,7 @@ use log::{debug, error, info};
 use rdkafka::producer::{FutureProducer, FutureRecord, Producer as ProducerTrait};
 use rdkafka::config::ClientConfig;
 use rdkafka::message::OwnedHeaders;
+use serde_json::Value;
 
 use crate::model::Record;
 use crate::repo::Repo;
@@ -61,13 +62,15 @@ impl Producer {
 
     async fn send(&self, record: Record) -> AppResult<()> {
         let mut headers = OwnedHeaders::new();
-        if let Some(ref value) = record.metadata {
-            if let Some(map) = value.as_object() {
-                for (k, v) in map {
-                    headers = headers.add(k, &serde_json::to_vec(v).unwrap());
+        if let Some(ref metadata) = record.metadata {
+            if let Ok(json_val) = serde_json::from_str::<Value>(metadata) {
+                if let Some(map) = json_val.as_object() {
+                    for (k, v) in map {
+                        headers = headers.add(k, &serde_json::to_vec(v).unwrap());
+                    }
+                } else {
+                    error!("metadata should be key value map")
                 }
-            } else {
-                error!("metadata should be key value map")
             }
         }
 

@@ -8,7 +8,7 @@ pub struct Record {
     pub aggregate_id: String,
     pub event_type: String,
     pub payload: String,
-    pub metadata: Option<Value>
+    pub metadata: Option<String>
 }
 
 impl Record {

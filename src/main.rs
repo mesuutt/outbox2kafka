@@ -28,7 +28,7 @@ async fn main() -> AppResult<()> {
     let opts = Opt::from_args();
 
     let db_pool = create_pool(opts.db_url, opts.max_db_connection).await?;
-    let repo = Arc::new(Repo::new(db_pool, opts.processed_data_retention));
+    let repo = Arc::new(Repo::new(db_pool, opts.table_name, opts.processed_data_retention));
 
     let mut tasks = vec![];
 

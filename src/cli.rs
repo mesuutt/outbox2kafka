@@ -17,6 +17,9 @@ pub struct Opt {
     #[structopt(short, long, env = "DATABASE_URL", hide_env_values = true)]
     pub db_url: String,
 
+    #[structopt(long)]
+    pub table_name: String,
+
     #[structopt(long, default_value = "2")]
     pub max_db_connection: u32,
 
@@ -34,7 +37,7 @@ fn parse_duration(src: &str) -> AppResult<Duration> {
     duration_str::parse(src).map_err(|_| AppError::DurationParseError(src.to_string()))
 }
 
-fn parse_cleaner_run_interval(src: &str)  -> AppResult<Duration> {
+fn parse_cleaner_run_interval(src: &str) -> AppResult<Duration> {
     let duration = parse_duration(src)?;
     if duration < Duration::from_secs(60) {
         return Err(AppError::DurationParseError("should be at least 1m".to_string()));
