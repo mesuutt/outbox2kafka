@@ -62,6 +62,25 @@ impl Producer {
     }
 
     async fn send(&self, record: Record) -> AppResult<()> {
+        let mut future_record = FutureRecord::to(&self.topic)
+                    .key(&record.aggregate_id)
+                    .payload(&record.payload);
+
+        if let Some(headers) = Producer::build_headers(&record) {
+            future_record = future_record.headers(headers);
+        }
+
+        self.producer
+            .send(future_record, Duration::from_secs(0))
+            .await
+            .map_err(|(x, _)| AppError::KafkaError(x))?;
+
+        debug!("record sent to kafka: {}({})", record.event_type, record.aggregate_id);
+
+        Ok(())
+    }
+
+    fn build_headers(record: &Record) -> Option<OwnedHeaders> {
         let mut headers = OwnedHeaders::new()
             .add("event_type", &record.event_type)
             .add("aggregate_id", &record.aggregate_id);
@@ -70,27 +89,19 @@ impl Producer {
             if let Ok(json_val) = serde_json::from_str::<Value>(metadata) {
                 if let Some(map) = json_val.as_object() {
                     for (k, v) in map {
-                        headers = headers.add(k, &serde_json::to_vec(v).unwrap());
+                        if let Some(x) = v.as_str() {
+                            headers = headers.add(k, x);
+                        } else if let Ok(x) = serde_json::to_string(v) {
+                            headers = headers.add(k, &x);
+                        }
                     }
+                    return Some(headers);
                 } else {
-                    error!("metadata should be key value map")
+                    error!("metadata should be key value map");
                 }
             }
         }
 
-        self.producer
-            .send(
-                FutureRecord::to(&self.topic)
-                    .payload(&record.payload)
-                    .headers(headers)
-                    .key(&record.aggregate_id),
-                Duration::from_secs(0),
-            )
-            .await
-            .map_err(|(x, _)| AppError::KafkaError(x))?;
-
-        debug!("record sent to kafka: {}({})", record.event_type, record.aggregate_id);
-
-        Ok(())
+        None
     }
 }
