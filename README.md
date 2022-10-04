@@ -76,7 +76,7 @@ Max db connection to open. Default: `2`
 </details>
 
 Each flag can be given with an env variable.
-For example for giving `--db-url` flag with env variable you have to use `OUTBOX2KAFKA_DB_URL`.
+For example for giving `--db-url` flag with env var you have to use `OUTBOX2KAFKA_DB_URL`.
 
 -----
 
