@@ -2,22 +2,6 @@ Read events from outbox table and send to kafka
 
 ----
 
-
-### Outbox table schema
-
-```sql
-CREATE TABLE outbox (
-    id uuid NOT NULL,
-    aggregate_type character varying(255) NOT NULL,
-    aggregate_id character varying(255) NOT NULL,
-    event_type character varying(255) NOT NULL,
-    payload text NOT NULL,
-    metadata json,
-    created timestamp with time zone NOT NULL,                                     
-    processed_at timestamp with time zone
-);
-```
-
 #### CLI Options
 
 
@@ -79,5 +63,22 @@ Each flag can be given with an env variable.
 For example for giving `--db-url` flag with env var you have to use `OUTBOX2KAFKA_DB_URL`.
 
 -----
+
+### Outbox table schema
+
+```sql
+CREATE TABLE my_outbox_table (
+    id uuid NOT NULL,
+    aggregate_type character varying(255) NOT NULL,
+    aggregate_id character varying(255) NOT NULL,
+    event_type character varying(255) NOT NULL,
+    payload text NOT NULL,
+    metadata text,
+    created timestamp with time zone NOT NULL,
+    processed_at timestamp with time zone
+);
+```
+
+---
 
 License: MIT
