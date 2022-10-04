@@ -74,7 +74,7 @@ CREATE TABLE my_outbox_table (
     event_type character varying(255) NOT NULL,
     payload text NOT NULL,
     metadata text,
-    created timestamp with time zone NOT NULL,
+    created_at timestamp with time zone NOT NULL,
     processed_at timestamp with time zone
 );
 ```

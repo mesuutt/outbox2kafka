@@ -60,7 +60,7 @@ impl Repo {
                 event_type, payload, metadata
             from {}
             where processed_at is null
-            order by created
+            order by created_at
             FOR UPDATE SKIP LOCKED
             "#,
                 &self.table_name
