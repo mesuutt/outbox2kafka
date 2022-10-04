@@ -5,31 +5,31 @@ use structopt::StructOpt;
 #[derive(Debug, Clone, StructOpt)]
 #[structopt(name = "outbox2kafka", about = "Read events from outbox table and send to kafka")]
 pub struct Opt {
-    #[structopt(short, long, default_value = "localhost:9092")]
+    #[structopt(short, long, default_value = "localhost:9092", env = "OUTBOX2KAFKA_BROKERS", hide_env_values = true)]
     pub brokers: String,
 
-    #[structopt(long)]
+    #[structopt(long, env = "OUTBOX2KAFKA_TOPIC", hide_env_values = true)]
     pub topic: String,
 
-    #[structopt(short, long, default_value = "1")]
+    #[structopt(short, long, default_value = "1", env = "OUTBOX2KAFKA_CONCURRENCY", hide_env_values = true)]
     pub concurrency: u32,
 
-    #[structopt(short, long, env = "DATABASE_URL", hide_env_values = true)]
+    #[structopt(short, long, env = "OUTBOX2KAFKA_DB_URL", hide_env_values = true)]
     pub db_url: String,
 
-    #[structopt(long)]
+    #[structopt(long, env = "OUTBOX2KAFKA_TABLE_NAME", hide_env_values = true)]
     pub table_name: String,
 
-    #[structopt(long, default_value = "2")]
+    #[structopt(long, default_value = "2", env = "OUTBOX2KAFKA_MAX_DB_CONNECTION", hide_env_values = true)]
     pub max_db_connection: u32,
 
-    #[structopt(long, parse(try_from_str = parse_duration), default_value = "10ms")]
+    #[structopt(long, parse(try_from_str = parse_duration), default_value = "10ms", env = "OUTBOX2KAFKA_OUTBOX_CHECK_INTERVAL", hide_env_values = true)]
     pub outbox_check_interval: Duration,
 
-    #[structopt(long, parse(try_from_str = parse_cleaner_run_interval), default_value = "10m")]
+    #[structopt(long, parse(try_from_str = parse_cleaner_run_interval), default_value = "10m", env = "OUTBOX2KAFKA_CLEANER_RUN_INTERVAL", hide_env_values = true)]
     pub cleaner_run_interval: Duration,
 
-    #[structopt(long, parse(try_from_str = parse_duration), default_value = "1h")]
+    #[structopt(long, parse(try_from_str = parse_duration), default_value = "1h", env = "OUTBOX2KAFKA_PROCESSED_DATA_RETENTION", hide_env_values = true)]
     pub processed_data_retention: Duration,
 }
 
