@@ -1,4 +1,4 @@
-Read events from outbox table and send to kafka
+Read events from outbox table periodically and send to kafka.
 
 ----
 
@@ -68,9 +68,8 @@ For example for giving `--db-url` flag with env var you have to use `OUTBOX2KAFK
 
 ```sql
 CREATE TABLE my_outbox_table (
-    id uuid NOT NULL,
-    aggregate_id character varying(255) NOT NULL,
-    event_type character varying(255) NOT NULL,
+    aggregate_id character varying(255) NOT NULL, // using message key and adding to event headers
+    event_type character varying(255) NOT NULL, // adding to event headers
     payload text NOT NULL,
     metadata text,
     occurred_on timestamp with time zone NOT NULL,
