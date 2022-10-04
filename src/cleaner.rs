@@ -1,5 +1,5 @@
 use chrono::Utc;
-use log::{debug, error, info};
+use log::{error, info};
 use std::future::Future;
 use std::ops::Sub;
 use std::sync::Arc;
@@ -48,7 +48,7 @@ impl OutboxCleaner {
                 error!("error occurred while deletion of old processed records: {}", e);
             }
 
-            debug!("old processed records deleted from db {}", self.run_interval.as_secs());
+            info!("{} old processed records deleted from db", self.run_interval.as_secs());
         }
     }
 }
