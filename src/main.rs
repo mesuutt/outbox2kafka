@@ -3,6 +3,7 @@ extern crate core;
 use futures::future::join_all;
 use log::info;
 use std::sync::Arc;
+use env_logger::Env;
 use structopt::StructOpt;
 
 mod cleaner;
@@ -23,7 +24,7 @@ use tokio::signal;
 
 #[tokio::main]
 async fn main() -> AppResult<()> {
-    env_logger::init();
+    env_logger::init_from_env(Env::default().default_filter_or("info,sqlx=error,tokio_postgres=error"));
 
     let opts = Opt::from_args();
 
