@@ -1,12 +1,12 @@
+use log::{debug, error, info};
 use std::future::Future;
 use std::sync::Arc;
 use std::time;
 use std::time::Duration;
-use log::{debug, error, info};
 
-use rdkafka::producer::{FutureProducer, FutureRecord, Producer as ProducerTrait};
 use rdkafka::config::ClientConfig;
 use rdkafka::message::OwnedHeaders;
+use rdkafka::producer::{FutureProducer, FutureRecord, Producer as ProducerTrait};
 use serde_json::Value;
 
 use crate::model::Record;
@@ -50,9 +50,10 @@ impl Producer {
         loop {
             interval.tick().await;
 
-            let result = self.repo.get_for_process(|record: Record| async move {
-                self.send(record).await
-            }).await;
+            let result = self
+                .repo
+                .get_for_process(|record: Record| async move { self.send(record).await })
+                .await;
 
             if let Err(e) = result {
                 error!("producer error: {:?}", e)
@@ -74,12 +75,14 @@ impl Producer {
             }
         }
 
-        self.producer.send(
-            FutureRecord::to(&self.topic)
-                .payload(&record.payload)
-                .headers(headers)
-                .key(&record.key()
-                ), Duration::from_secs(0))
+        self.producer
+            .send(
+                FutureRecord::to(&self.topic)
+                    .payload(&record.payload)
+                    .headers(headers)
+                    .key(&record.key()),
+                Duration::from_secs(0),
+            )
             .await
             .map_err(|(x, _)| AppError::KafkaError(x))?;
 

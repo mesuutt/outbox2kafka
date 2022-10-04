@@ -1,10 +1,10 @@
+use chrono::Utc;
+use log::{debug, error, info};
 use std::future::Future;
 use std::ops::Sub;
 use std::sync::Arc;
 use std::time;
 use std::time::Duration;
-use chrono::Utc;
-use log::{debug, error, info};
 
 use crate::{AppError, AppResult, Repo};
 

@@ -1,8 +1,8 @@
 extern crate core;
 
-use std::sync::Arc;
 use futures::future::join_all;
-use log::{info};
+use log::info;
+use std::sync::Arc;
 use structopt::StructOpt;
 
 mod cleaner;
@@ -13,12 +13,12 @@ mod model;
 mod producer;
 mod repo;
 
+use crate::cleaner::OutboxCleaner;
 use crate::cli::Opt;
 use crate::db::create_pool;
-use crate::producer::{Producer};
+use crate::producer::Producer;
 use crate::repo::Repo;
 use error::{AppError, AppResult};
-use crate::cleaner::OutboxCleaner;
 use tokio::signal;
 
 #[tokio::main]
@@ -33,11 +33,7 @@ async fn main() -> AppResult<()> {
     let mut tasks = vec![];
 
     if !opts.processed_data_retention.is_zero() {
-        let cleaner = OutboxCleaner::new(
-            repo.clone(),
-            opts.cleaner_run_interval,
-            opts.processed_data_retention
-        )?;
+        let cleaner = OutboxCleaner::new(repo.clone(), opts.cleaner_run_interval, opts.processed_data_retention)?;
 
         let task = tokio::spawn(async move {
             info!("outbox table cleaner starting");
@@ -48,12 +44,8 @@ async fn main() -> AppResult<()> {
     }
 
     for i in 0..opts.concurrency {
-        let producer = Producer::new(
-            opts.brokers.clone(),
-            opts.topic.clone(),
-            repo.clone(),
-            opts.outbox_check_interval
-        )?;
+        let producer =
+            Producer::new(opts.brokers.clone(), opts.topic.clone(), repo.clone(), opts.outbox_check_interval)?;
 
         let task = tokio::spawn(async move {
             info!("{}. producer worker starting", i);
