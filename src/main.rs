@@ -24,7 +24,7 @@ use tokio::signal;
 
 #[tokio::main]
 async fn main() -> AppResult<()> {
-    env_logger::init_from_env(Env::default().default_filter_or("info,sqlx=error,tokio_postgres=error"));
+    env_logger::init_from_env(Env::default().default_filter_or("info,sqlx=error"));
 
     let opts = Opt::from_args();
 
