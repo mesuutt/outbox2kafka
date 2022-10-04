@@ -69,13 +69,12 @@ For example for giving `--db-url` flag with env var you have to use `OUTBOX2KAFK
 ```sql
 CREATE TABLE my_outbox_table (
     id uuid NOT NULL,
-    aggregate_type character varying(255) NOT NULL,
     aggregate_id character varying(255) NOT NULL,
     event_type character varying(255) NOT NULL,
     payload text NOT NULL,
     metadata text,
-    created_at timestamp with time zone NOT NULL,
-    processed_at timestamp with time zone
+    occurred_on timestamp with time zone NOT NULL,
+    processed_date timestamp with time zone
 );
 ```
 

@@ -62,7 +62,10 @@ impl Producer {
     }
 
     async fn send(&self, record: Record) -> AppResult<()> {
-        let mut headers = OwnedHeaders::new();
+        let mut headers = OwnedHeaders::new()
+            .add("event_type", &record.event_type)
+            .add("aggregate_id", &record.aggregate_id);
+
         if let Some(ref metadata) = record.metadata {
             if let Ok(json_val) = serde_json::from_str::<Value>(metadata) {
                 if let Some(map) = json_val.as_object() {
@@ -80,13 +83,13 @@ impl Producer {
                 FutureRecord::to(&self.topic)
                     .payload(&record.payload)
                     .headers(headers)
-                    .key(&record.key()),
+                    .key(&record.aggregate_id),
                 Duration::from_secs(0),
             )
             .await
             .map_err(|(x, _)| AppError::KafkaError(x))?;
 
-        debug!("record sent to kafka: {:?}", record.key());
+        debug!("record sent to kafka: {}({})", record.event_type, record.aggregate_id);
 
         Ok(())
     }

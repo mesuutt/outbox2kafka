@@ -56,11 +56,12 @@ impl Repo {
         let sql = SQL_GET_ONE_RECORD.get_or_init(|| {
             format!(
                 r#"Select
-                id, aggregate_type, aggregate_id,
-                event_type, payload, metadata
+                id,
+                aggregate_id, event_type,
+                payload, metadata
             from {}
-            where processed_at is null
-            order by created_at
+            where processed_date is null
+            order by occurred_on
             FOR UPDATE SKIP LOCKED
             "#,
                 &self.table_name
@@ -72,18 +73,17 @@ impl Repo {
             None => Ok(None),
             Some(r) => Ok(Some(Record {
                 id: r.get(0),
-                aggregate_type: r.get(1),
-                aggregate_id: r.get(2),
-                event_type: r.get(3),
-                payload: r.get(4),
-                metadata: r.get(5),
+                aggregate_id: r.get(1),
+                event_type: r.get(2),
+                payload: r.get(3),
+                metadata: r.get(4),
             })),
         }
     }
 
     async fn mark_as_processed(&self, id: Uuid) -> AppResult<()> {
         let sql = SQL_MARK_RECORD_AS_PROCESSED
-            .get_or_init(|| format!("Update {} set processed_at=$1 where id=$2", &self.table_name));
+            .get_or_init(|| format!("Update {} set processed_date=$1 where id=$2", &self.table_name));
         sqlx::query(sql).bind(Utc::now()).bind(id).execute(&self.pool).await?;
 
         Ok(())
@@ -98,7 +98,7 @@ impl Repo {
 
     pub async fn delete_older_than(&self, time: DateTime<Utc>) -> AppResult<()> {
         let sql =
-            SQL_DELETE_OLD_RECORDS.get_or_init(|| format!("Delete from {} where processed_at <$1", &self.table_name));
+            SQL_DELETE_OLD_RECORDS.get_or_init(|| format!("Delete from {} where processed_date <$1", &self.table_name));
 
         sqlx::query(sql).bind(time).execute(&self.pool).await?;
 
