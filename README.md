@@ -1,4 +1,4 @@
-Read events from outbox table periodically and send to kafka.
+Periodically read events from outbox table and send to kafka.
 
 ----
 
