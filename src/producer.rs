@@ -7,7 +7,7 @@ use std::time::Duration;
 use rdkafka::config::ClientConfig;
 use rdkafka::message::OwnedHeaders;
 use rdkafka::producer::{FutureProducer, FutureRecord, Producer as ProducerTrait};
-use serde_json::{Map, Value};
+use serde_json::Value;
 
 use crate::model::Record;
 use crate::repo::Repo;
@@ -82,20 +82,23 @@ impl Producer {
             .add("event_type", &record.event_type)
             .add("aggregate_id", &record.aggregate_id);
 
-        if let Some(ref metadata) = record.metadata {
-            if let Ok(json_val) = serde_json::from_str::<Value>(metadata) {
-                match json_val.as_object() {
-                    None => return Err(AppError::InvalidMetadataError(record.id)),
-                    Some(map) => {
-                        for (k, v) in map {
-                            if let Some(x) = v.as_str() {
-                                headers = headers.add(k, x);
-                            } else if let Ok(x) = serde_json::to_string(v) {
-                                headers = headers.add(k, &x);
-                            }
-                        }
-                    }
-                }
+        let metadata = if let Some(x) = &record.metadata { x } else {
+            return Ok(headers);
+        };
+
+        let json_val = if let Ok(x) = serde_json::from_str::<Value>(metadata) { x } else {
+            return Err(AppError::InvalidMetadataError(record.id));
+        };
+
+        let kv_map = if let Some(x) = json_val.as_object() { x } else {
+            return Err(AppError::InvalidMetadataError(record.id));
+        };
+
+        for (k, v) in kv_map {
+            if let Some(x) = v.as_str() {
+                headers = headers.add(k, x);
+            } else if let Ok(x) = serde_json::to_string(v) {
+                headers = headers.add(k, &x);
             }
         }
 
