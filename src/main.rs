@@ -7,7 +7,7 @@ use env_logger::Env;
 use structopt::StructOpt;
 
 mod cleaner;
-mod cli;
+mod args;
 mod db;
 mod error;
 mod model;
@@ -15,7 +15,7 @@ mod producer;
 mod repo;
 
 use crate::cleaner::OutboxCleaner;
-use crate::cli::Opt;
+use crate::args::Args;
 use crate::db::create_pool;
 use crate::producer::Producer;
 use crate::repo::Repo;
@@ -26,15 +26,15 @@ use tokio::signal;
 async fn main() -> AppResult<()> {
     env_logger::init_from_env(Env::default().default_filter_or("info,sqlx=error"));
 
-    let opts = Opt::from_args();
+    let args = Args::from_args();
 
-    let db_pool = create_pool(opts.db_url, opts.max_db_connection).await?;
-    let repo = Arc::new(Repo::new(db_pool, opts.table_name, opts.processed_data_retention));
+    let db_pool = create_pool(args.db_url, args.max_db_connection).await?;
+    let repo = Arc::new(Repo::new(db_pool, args.table_name, args.processed_data_retention));
 
     let mut tasks = vec![];
 
-    if !opts.processed_data_retention.is_zero() {
-        let cleaner = OutboxCleaner::new(repo.clone(), opts.cleaner_run_interval, opts.processed_data_retention)?;
+    if !args.processed_data_retention.is_zero() {
+        let cleaner = OutboxCleaner::new(repo.clone(), args.cleaner_run_interval, args.processed_data_retention)?;
 
         let task = tokio::spawn(async move {
             info!("outbox table cleaner starting");
@@ -44,9 +44,9 @@ async fn main() -> AppResult<()> {
         tasks.push(task);
     }
 
-    for i in 0..opts.concurrency {
+    for i in 0..args.concurrency {
         let producer =
-            Producer::new(opts.brokers.clone(), opts.topic.clone(), repo.clone(), opts.outbox_check_interval)?;
+            Producer::new(args.brokers.clone(), args.topic.clone(), repo.clone(), args.outbox_check_interval)?;
 
         let task = tokio::spawn(async move {
             info!("{}. producer worker starting", i);

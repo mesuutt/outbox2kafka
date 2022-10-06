@@ -6,20 +6,20 @@ Periodically read events from outbox table and send to kafka.
 
 
 ```
-OPTIONS:
-    -d, --db-url <db-url>
-        --table-name <table-name>
-    -b, --brokers <brokers>
-        --topic <topic>
-    -c, --concurrency <concurrency>      
-        --max-db-connection <max-db-connection> 
-        --outbox-check-interval <outbox-check-interval> 
-        --cleaner-run-interval <cleaner-run-interval>
-        --processed-data-retention <processed-data-retention>
+ARGUMENTS:
+    --db-url <db-url>
+    --table-name <table-name>
+    --brokers <brokers>
+    --topic <topic>
+    --concurrency <concurrency>      
+    --max-db-connection <max-db-connection> 
+    --outbox-check-interval <outbox-check-interval> 
+    --cleaner-run-interval <cleaner-run-interval>
+    --processed-data-retention <processed-data-retention>
 ```
 
 <details>
- <summary>Show details of each option</summary>
+ <summary>Show details of each argument</summary>
 
 Options can be given with flag or env variable
 
