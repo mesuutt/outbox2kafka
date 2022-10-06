@@ -2,11 +2,9 @@ Periodically read events from outbox table and send to kafka.
 
 ----
 
-#### CLI Options
-
+#### CLI Args
 
 ```
-ARGUMENTS:
     --db-url <db-url>
     --table-name <table-name>
     --brokers <brokers>
