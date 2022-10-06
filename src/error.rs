@@ -1,5 +1,6 @@
 use rdkafka::error::KafkaError;
 use thiserror::Error as ThisError;
+use uuid::Uuid;
 
 pub type AppResult<T> = Result<T, AppError>;
 
@@ -7,11 +8,15 @@ pub type AppResult<T> = Result<T, AppError>;
 pub enum AppError {
     #[error("An error occurred at db: {0}")]
     DBError(String),
-    #[error("Kafka error: {0}")]
-    KafkaError(#[from] KafkaError),
 
     #[error("An error occurred while parsing duration: {0}")]
     DurationParseError(String),
+
+    #[error("Kafka error: {0}")]
+    KafkaError(#[from] KafkaError),
+
+    #[error("metadata of record is invalid. It must be key value map: {0}")]
+    InvalidMetadataError(Uuid)
 }
 
 impl From<sqlx::Error> for AppError {
