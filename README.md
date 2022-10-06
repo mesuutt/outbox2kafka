@@ -60,6 +60,9 @@ Max db connection to use. You may give `concurrency` + 1, Default: `2`
 Each flag can be given with an env variable.
 For example for giving `--db-url` flag with env var you have to use `OUTBOX2KAFKA_DB_URL`.
 
+Also, you can overwrite default logging with `RUST_LOG` env variable. Default: `info,sqlx=error`.
+You can read [env_logger documentation](https://docs.rs/env_logger/latest/env_logger/) for more information.
+
 -----
 
 ### Outbox table schema
