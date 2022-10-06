@@ -48,8 +48,8 @@ Supported time units: `m,h,d,w,mon`. Default: `10m`
 
 **--processed-data-retention**
 
-Retention period of processed records in outbox table. `0` means never. 
-Supported time units: `ms,s,m,h,d,w,mon`. Default: `1h`
+Retention period of processed records in outbox table. `0` means delete just after sent to kafka. 
+Supported time units: `ms,s,m,h,d,w,mon`. Default: `1d`
 
 **--max-db-connection**
 
