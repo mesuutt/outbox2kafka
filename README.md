@@ -53,7 +53,7 @@ Supported time units: `ms,s,m,h,d,w,mon`. Default: `1h`
 
 **--max-db-connection**
 
-Max db connection to open. Default: `2`
+Max db connection to use. You may give `concurrency` + 1, Default: `2`
 
 </details>
 
