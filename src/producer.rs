@@ -52,11 +52,14 @@ impl Producer {
 
             let result = self
                 .repo
-                .get_for_process(|record: Record| async move { self.send(record).await })
+                .get_for_process(|record| async move {
+                    debug!("record sending to kafka: {}", record);
+                    self.send(record).await
+                })
                 .await;
 
             if let Err(e) = result {
-                error!("producer error: {}", e)
+                error!("sending record to kafka failed: {}", e)
             }
         }
     }
@@ -72,7 +75,7 @@ impl Producer {
             .await
             .map_err(|(x, _)| AppError::KafkaError(x))?;
 
-        debug!("record sent to kafka: {}({})", record.event_type, record.aggregate_id);
+        debug!("record sent to kafka: {}", record);
 
         Ok(())
     }
