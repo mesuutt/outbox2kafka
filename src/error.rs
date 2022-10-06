@@ -16,7 +16,7 @@ pub enum AppError {
     KafkaError(#[from] KafkaError),
 
     #[error("metadata of record is invalid. It must be key value map: {0}")]
-    InvalidMetadataError(Uuid)
+    InvalidMetadataError(Uuid),
 }
 
 impl From<sqlx::Error> for AppError {

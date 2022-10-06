@@ -1,21 +1,21 @@
 extern crate core;
 
+use env_logger::Env;
 use futures::future::join_all;
 use log::info;
 use std::sync::Arc;
-use env_logger::Env;
 use structopt::StructOpt;
 
-mod cleaner;
 mod args;
+mod cleaner;
 mod db;
 mod error;
 mod model;
 mod producer;
 mod repo;
 
-use crate::cleaner::OutboxCleaner;
 use crate::args::Args;
+use crate::cleaner::OutboxCleaner;
 use crate::db::create_pool;
 use crate::producer::Producer;
 use crate::repo::Repo;
