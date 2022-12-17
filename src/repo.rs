@@ -6,6 +6,7 @@ use crate::AppResult;
 use chrono::{DateTime, Utc};
 use once_cell::sync::OnceCell;
 use std::time::Duration;
+use log::info;
 
 use sqlx::Row;
 use uuid::Uuid;
@@ -98,9 +99,12 @@ impl Repo {
 
     pub async fn delete_older_than(&self, time: DateTime<Utc>) -> AppResult<()> {
         let sql =
-            SQL_DELETE_OLD_RECORDS.get_or_init(|| format!("Delete from {} where processed_date <$1", &self.table_name));
+            SQL_DELETE_OLD_RECORDS.get_or_init(|| format!("Delete from {} where processed_date < $1", &self.table_name));
 
-        sqlx::query(sql).bind(time).execute(&self.pool).await?;
+        let result = sqlx::query(sql).bind(time).execute(&self.pool).await?;
+        if result.rows_affected() > 0 {
+            info!("{} old processed records deleted from db", result.rows_affected());
+        }
 
         Ok(())
     }

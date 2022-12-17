@@ -47,8 +47,6 @@ impl OutboxCleaner {
             if let Err(e) = self.repo.delete_older_than(Utc::now().sub(self.retention)).await {
                 error!("error occurred while deletion of old processed records: {}", e);
             }
-
-            info!("{} old processed records deleted from db", self.run_interval.as_secs());
         }
     }
 }
