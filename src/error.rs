@@ -15,7 +15,7 @@ pub enum AppError {
     #[error("Kafka error: {0}")]
     KafkaError(#[from] KafkaError),
 
-    #[error("metadata of record is invalid. It must be key value map: {0}")]
+    #[error("metadata of record is invalid. It must be json deserializable string: {0}")]
     InvalidMetadataError(Uuid),
 }
 

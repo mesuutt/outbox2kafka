@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use log::{debug, error, info};
 use std::future::Future;
 use std::sync::Arc;
@@ -85,23 +86,19 @@ impl Producer {
             .add("event_type", &record.event_type)
             .add("aggregate_id", &record.aggregate_id);
 
-        let metadata = if let Some(x) = &record.metadata { x } else {
+        let metadata = if let Some(x) = &record.metadata { x.as_str() } else {
             return Ok(headers);
         };
 
-        let json_val = if let Ok(x) = serde_json::from_str::<Value>(metadata) { x } else {
+        let json_val: HashMap<String, Value> = if let Ok(x) = serde_json::from_str(metadata) { x } else {
             return Err(AppError::InvalidMetadataError(record.id));
         };
 
-        let kv_map = if let Some(x) = json_val.as_object() { x } else {
-            return Err(AppError::InvalidMetadataError(record.id));
-        };
-
-        for (k, v) in kv_map {
+        for (k, v) in json_val {
             if let Some(x) = v.as_str() {
-                headers = headers.add(k, x);
-            } else if let Ok(x) = serde_json::to_string(v) {
-                headers = headers.add(k, &x);
+                headers = headers.add(&k, x);
+            } else if let Ok(x) = serde_json::to_string(&v) {
+                headers = headers.add(&k, &x);
             }
         }
 
