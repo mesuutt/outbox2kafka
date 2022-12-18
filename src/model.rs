@@ -6,6 +6,7 @@ pub struct Record {
     pub id: Uuid,
     pub aggregate_id: String,
     pub event_type: String,
+    pub topic: String,
     pub payload: String,
     pub metadata: Option<String>,
 }

@@ -15,21 +15,19 @@ use crate::repo::Repo;
 use crate::{AppError, AppResult};
 
 pub struct Producer {
-    topic: String,
     repo: Arc<Repo>,
     check_interval: Duration,
     producer: FutureProducer,
 }
 
 impl Producer {
-    pub fn new(brokers: String, topic: String, repo: Arc<Repo>, check_interval: Duration) -> AppResult<Self> {
+    pub fn new(brokers: String, repo: Arc<Repo>, check_interval: Duration) -> AppResult<Self> {
         let producer: FutureProducer = ClientConfig::new()
             .set("bootstrap.servers", brokers)
             .set("message.timeout.ms", "5000")
             .create()?;
 
         Ok(Self {
-            topic,
             repo,
             check_interval,
             producer,
@@ -66,7 +64,7 @@ impl Producer {
     }
 
     async fn send(&self, record: Record) -> AppResult<()> {
-        let future_record = FutureRecord::to(&self.topic)
+        let future_record = FutureRecord::to(&record.topic)
             .key(&record.aggregate_id)
             .headers(Producer::build_headers(&record)?)
             .payload(&record.payload);

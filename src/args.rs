@@ -8,9 +8,6 @@ pub struct Args {
     #[structopt(long, default_value = "localhost:9092", env = "OUTBOX2KAFKA_BROKERS", hide_env_values = true)]
     pub brokers: String,
 
-    #[structopt(long, env = "OUTBOX2KAFKA_TOPIC", hide_env_values = true)]
-    pub topic: String,
-
     #[structopt(long, default_value = "1", env = "OUTBOX2KAFKA_CONCURRENCY", hide_env_values = true)]
     pub concurrency: u32,
 

@@ -46,7 +46,7 @@ async fn main() -> AppResult<()> {
 
     for i in 0..args.concurrency {
         let producer =
-            Producer::new(args.brokers.clone(), args.topic.clone(), repo.clone(), args.outbox_check_interval)?;
+            Producer::new(args.brokers.clone(), repo.clone(), args.outbox_check_interval)?;
 
         let task = tokio::spawn(async move {
             info!("{}. producer worker starting", i);

@@ -59,7 +59,7 @@ impl Repo {
                 r#"Select
                 id,
                 aggregate_id, event_type,
-                payload, metadata
+                topic, payload, metadata
             from {}
             where processed_date is null
             order by occurred_on
@@ -76,22 +76,23 @@ impl Repo {
                 id: r.get(0),
                 aggregate_id: r.get(1),
                 event_type: r.get(2),
-                payload: r.get(3),
-                metadata: r.get(4),
+                topic: r.get(3),
+                payload: r.get(4),
+                metadata: r.get(5),
             })),
         }
     }
 
     async fn mark_as_processed(&self, id: Uuid) -> AppResult<()> {
         let sql = SQL_MARK_RECORD_AS_PROCESSED
-            .get_or_init(|| format!("Update {} set processed_date=$1 where id=$2", &self.table_name));
+            .get_or_init(|| format!("Update {} set processed_date = $1 where id = $2", &self.table_name));
         sqlx::query(sql).bind(Utc::now()).bind(id).execute(&self.pool).await?;
 
         Ok(())
     }
 
     async fn delete_record(&self, id: Uuid) -> AppResult<()> {
-        let sql = SQL_DELETE_ONE_RECORD.get_or_init(|| format!("Delete from {} where id=$1", &self.table_name));
+        let sql = SQL_DELETE_ONE_RECORD.get_or_init(|| format!("Delete from {} where id = $1", &self.table_name));
 
         sqlx::query(sql).bind(id).execute(&self.pool).await?;
         Ok(())

@@ -8,7 +8,6 @@ Periodically read events from outbox table and send to kafka.
     --db-url <db-url>
     --table-name <table-name>
     --brokers <brokers>
-    --topic <topic>
     --concurrency <concurrency>      
     --max-db-connection <max-db-connection> 
     --outbox-check-interval <outbox-check-interval> 
@@ -72,6 +71,7 @@ CREATE TABLE my_outbox_table (
     id uuid NOT NULL,
     aggregate_id character varying(255) NOT NULL, -- using message key and adding to event headers
     event_type character varying(255) NOT NULL, -- adding to event headers
+    topic character varying(255) NOT NULL, -- topic to send event
     payload text NOT NULL,
     metadata text,
     occurred_on timestamp with time zone NOT NULL,
