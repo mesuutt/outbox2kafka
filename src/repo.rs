@@ -104,7 +104,7 @@ impl Repo {
 
         let result = sqlx::query(sql).bind(time).execute(&self.pool).await?;
         if result.rows_affected() > 0 {
-            info!("{} old processed records deleted from db", result.rows_affected());
+            info!("{} old processed records deleted from outbox table", result.rows_affected());
         }
 
         Ok(())
