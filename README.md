@@ -73,7 +73,7 @@ CREATE TABLE my_outbox_table (
     event_type character varying(255) NOT NULL, -- adding to event headers
     topic character varying(255) NOT NULL, -- topic to send event
     payload text NOT NULL,
-    metadata text,
+    metadata text, -- nullable, json like {"correlationId": "uuid"}
     occurred_on timestamp with time zone NOT NULL,
     processed_date timestamp with time zone
 );
