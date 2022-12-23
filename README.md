@@ -79,6 +79,13 @@ CREATE TABLE my_outbox_table (
 );
 ```
 
+
+### Building
+
+The crate needs to `cmake` for building rdkafka and link it statically to executable.
+After installing cmake you can build with `cargo build --release`
+
+
 ---
 
 License: MIT
