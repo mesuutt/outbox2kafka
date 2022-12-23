@@ -1,5 +1,5 @@
 use chrono::Utc;
-use log::{error, info};
+use log::{error, info, warn};
 use std::future::Future;
 use std::ops::Sub;
 use std::sync::Arc;
@@ -17,7 +17,7 @@ pub struct OutboxCleaner {
 impl OutboxCleaner {
     pub fn new(repo: Arc<Repo>, run_interval: time::Duration, retention: time::Duration) -> AppResult<Self> {
         if run_interval < Duration::from_secs(60) {
-            return Err(AppError::DurationParseError("outbox table cleaner run interval must be >= 1m".to_string()));
+            warn!("outbox table cleaner run interval might be >= 1m");
         }
 
         let retention = chrono::Duration::from_std(retention)
